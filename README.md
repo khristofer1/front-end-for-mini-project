@@ -1,1 +1,1 @@
-# mini-project-frontend
+# mini-project-front-end
