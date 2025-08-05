@@ -19,12 +19,21 @@ export default function HomePage() {
   const [debouncedSearch] = useDebounce(search, 500)
   const [category, setCategory] = useState('')
   const [location, setLocation] = useState('')
+
   const [page, setPage] = useState(1)
   const limit = 6
+
   const [hasMore, setHasMore] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Reset page when filters/search change
+  useEffect(() => {
+    setPage(1)
+  }), [debouncedSearch, category, location]
 
   useEffect(() => {
     const fetchEvents = async () => {
+      setIsLoading(true)
       const query = new URLSearchParams({
         search: debouncedSearch,
         category,
@@ -34,9 +43,10 @@ export default function HomePage() {
       })
 
       const res = await fetch(`http://localhost:5000/api/events?${query.toString()}`)
-      const data = await res.json()
+      const data: Event[] = await res.json()
       setEvents(data)
       setHasMore(data.length === limit)
+      setIsLoading(false)
     }
 
     fetchEvents()
@@ -86,20 +96,23 @@ export default function HomePage() {
         )}
       </div>
 
-      <div className="flex justify-center gap-4 mt-4">
+      <div className="flex justify-center gap-4 mt-4 items-center">
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
+          disabled={page === 1 || isLoading}
           className="px-4 py-2 border rounded disabled:opacity-50"
         >
           Previous
         </button>
 
-        <span className="py-2">Page {page}</span>
+        <span className="py-2">
+          Page {page}
+        </span>
 
         <button
           onClick={() => setPage((prev) => prev + 1)}
-          className="px-4 py-2 border rounded"
+          disabled={!hasMore || isLoading}
+          className="px-4 py-2 border rounded disabled:opacity-50"
         >
           Next
         </button>
