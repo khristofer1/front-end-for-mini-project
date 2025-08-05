@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import EventCard from '@/components/EventCard'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
 type Event = {
   id: string
@@ -20,6 +19,9 @@ export default function HomePage() {
   const [debouncedSearch] = useDebounce(search, 500)
   const [category, setCategory] = useState('')
   const [location, setLocation] = useState('')
+  const [page, setPage] = useState(1)
+  const limit = 6
+  const [hasMore, setHasMore] = useState(true)
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -27,15 +29,18 @@ export default function HomePage() {
         search: debouncedSearch,
         category,
         location,
+        page: page.toString(),
+        limit: limit.toString(),
       })
 
       const res = await fetch(`http://localhost:5000/api/events?${query.toString()}`)
       const data = await res.json()
       setEvents(data)
+      setHasMore(data.length === limit)
     }
 
     fetchEvents()
-  }, [debouncedSearch, category, location])
+  }, [debouncedSearch, category, location, page])
 
   return (
     <main className="p-8 space-y-4">
@@ -79,6 +84,25 @@ export default function HomePage() {
         ) : (
           <p className="col-span-full text-center text-gray-500">Tidak ada event ditemukan.</p>
         )}
+      </div>
+
+      <div className="flex justify-center gap-4 mt-4">
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          className="px-4 py-2 border rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <span className="py-2">Page {page}</span>
+
+        <button
+          onClick={() => setPage((prev) => prev + 1)}
+          className="px-4 py-2 border rounded"
+        >
+          Next
+        </button>
       </div>
     </main>
   )
