@@ -26,10 +26,9 @@ export default function HomePage() {
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Reset page when filters/search change
   useEffect(() => {
     setPage(1)
-  }), [debouncedSearch, category, location]
+  }, [debouncedSearch, category, location])
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -53,20 +52,21 @@ export default function HomePage() {
   }, [debouncedSearch, category, location, page])
 
   return (
-    <main className="p-8 space-y-4">
-      <h1 className="text-2xl font-bold">Cari Event</h1>
+    <main className="p-8 space-y-6 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-bold text-center">Cari Event</h1>
 
-      <div className="flex flex-col md:flex-row gap-4">
+      {/* Filter Section */}
+      <div className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row gap-4">
         <input
           type="text"
           placeholder="Cari berdasarkan nama atau lokasi..."
-          className="flex-1 border rounded p-2"
+          className="flex-1 border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
-          className="border rounded p-2"
+          className="border rounded px-3 py-2"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
@@ -77,7 +77,7 @@ export default function HomePage() {
         </select>
 
         <select
-          className="border rounded p-2"
+          className="border rounded px-3 py-2"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
         >
@@ -88,7 +88,8 @@ export default function HomePage() {
         </select>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Event Cards */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.length > 0 ? (
           events.map((event) => <EventCard key={event.id} {...event} />)
         ) : (
@@ -96,23 +97,22 @@ export default function HomePage() {
         )}
       </div>
 
-      <div className="flex justify-center gap-4 mt-4 items-center">
+      {/* Pagination */}
+      <div className="flex justify-center gap-4 mt-6 items-center">
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1 || isLoading}
-          className="px-4 py-2 border rounded disabled:opacity-50"
+          className="px-4 py-2 border rounded hover:bg-gray-100 disabled:opacity-50"
         >
           Previous
         </button>
 
-        <span className="py-2">
-          Page {page}
-        </span>
+        <span className="py-2">Page {page}</span>
 
         <button
           onClick={() => setPage((prev) => prev + 1)}
           disabled={!hasMore || isLoading}
-          className="px-4 py-2 border rounded disabled:opacity-50"
+          className="px-4 py-2 border rounded hover:bg-gray-100 disabled:opacity-50"
         >
           Next
         </button>
