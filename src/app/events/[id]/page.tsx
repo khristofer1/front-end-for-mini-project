@@ -14,37 +14,33 @@ type Event = {
 }
 
 export default function EventDetailPage() {
-  const { id } = useParams()
+  const params = useParams()
+  const id = params.id as string
+
   const [event, setEvent] = useState<Event | null>(null)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchEvent = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/events/${id}`)
-        const data = await res.json()
-        setEvent(data)
-      } catch (error) {
-        console.error('Error fetching event:', error)
-      } finally {
-        setLoading(false)
-      }
+      const res = await fetch(`http://localhost:5000/api/events/${id}`)
+      const data = await res.json()
+      setEvent(data)
     }
 
-    if (id) fetchEvent()
+    fetchEvent()
   }, [id])
 
-  if (loading) return <p className="p-4">Loading...</p>
-  if (!event) return <p className="p-4">Event tidak ditemukan</p>
+  if (!event) {
+    return <p className='p-8 text-gray-500'>Loading...</p>
+  }
 
   return (
-    <main className="p-8">
-      <h1 className="text-3xl font-bold mb-4">{event.name}</h1>
-      <p className="text-gray-600 mb-2">Lokasi: {event.location}</p>
-      <p className="text-gray-600 mb-2">Tanggal: {event.date}</p>
-      <p className="text-gray-600 mb-2">Waktu: {event.time}</p>
-      <p className="text-gray-800 mb-4">
-        Harga: {event.price === 0 ? 'Gratis' : `Rp ${event.price.toLocaleString()}`}
+    <main className="p-8 space-y-4">
+      <h1 className="text-3xl font-bold">{event.name}</h1>
+      <p className="text-gray-600">
+        📍 {event.location} | 🗓 {event.date} | ⏰ {event.time}
+      </p>
+      <p className="text-lg font-semibold">
+        {event.price === 0 ? 'Gratis' : `Rp ${event.price.toLocaleString()}`}
       </p>
       <p>{event.description}</p>
     </main>
