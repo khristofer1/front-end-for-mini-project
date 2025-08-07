@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
+import { useRouter, useParams } from 'next/navigation'
 
 type Event = {
   id: string
@@ -14,64 +13,72 @@ type Event = {
   description: string
 }
 
-export default function EventDetailsPage() {
-  const params = useParams()
+export default function EventDetailPage() {
+  const { id } = useParams()
+  const router = useRouter()
   const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/events/${params.id}`)
+        const res = await fetch(`http://localhost:5000/api/events/${id}`)
+        if (!res.ok) throw new Error('Event not found')
         const data = await res.json()
         setEvent(data)
       } catch (error) {
-        console.error('Failed to fetch event details:', error)
+        console.error(error)
       } finally {
         setLoading(false)
       }
     }
 
-    if (params.id) {
-      fetchEvent()
-    }
-  }, [params.id])
+    fetchEvent()
+  }, [id])
 
   if (loading) {
-    return <p className="text-center mt-8">Loading event details...</p>
+    return (
+      <div className="p-8 text-center text-gray-500">Loading event details...</div>
+    )
   }
 
   if (!event) {
-    return <p className="text-center mt-8">Event tidak ditemukan.</p>
+    return (
+      <div className="p-8 text-center text-red-500">Event not found.</div>
+    )
   }
 
   return (
-    <main className="p-6 md:p-10 max-w-3xl mx-auto bg-white rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold mb-4">{event.name}</h1>
+    <main className="p-4 md:p-8 max-w-xl mx-auto space-y-6">
+      {/* Tombol Kembali */}
+      <button
+        onClick={() => router.back()}
+        className="text-blue-600 hover:underline mb-4"
+      >
+        ← Kembali
+      </button>
 
-      <div className="flex items-center gap-6 mb-4 text-gray-600">
-        <p>📍 {event.location}</p>
-        <p>📅 {event.date}</p>
-        <p>⏰ {event.time}</p>
+      {/* Detail Event */}
+      <h1 className="text-2xl md:text-3xl font-bold">{event.name}</h1>
+
+      <div className="text-gray-600 space-y-1">
+        <p><span className="font-medium">Tanggal:</span> {event.date}</p>
+        <p><span className="font-medium">Waktu:</span> {event.time}</p>
+        <p><span className="font-medium">Lokasi:</span> {event.location}</p>
+        <p>
+          <span className="font-medium">Harga:</span>{' '}
+          {event.price > 0 ? `Rp ${event.price.toLocaleString()}` : 'Gratis'}
+        </p>
       </div>
 
-      <p className="text-lg font-semibold text-blue-600 mb-6">
-        {event.price > 0 ? `Rp ${event.price.toLocaleString()}` : 'Gratis'}
-      </p>
+      <p className="text-gray-800 leading-relaxed">{event.description}</p>
 
-      <p className="text-gray-700 mb-6 leading-relaxed">{event.description}</p>
-
-      <div className="flex justify-between mt-6">
-        <Link
-          href="/"
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
-        >
-          ← Kembali ke Daftar Event
-        </Link>
-        <button className="px-6 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition">
-          Beli Tiket
-        </button>
-      </div>
+      {/* Tombol Aksi */}
+      <button
+        className="w-full md:w-auto bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700 transition"
+      >
+        Daftar Sekarang
+      </button>
     </main>
   )
 }
