@@ -19,10 +19,8 @@ export default function HomePage() {
   const [debouncedSearch] = useDebounce(search, 500)
   const [category, setCategory] = useState('')
   const [location, setLocation] = useState('')
-
   const [page, setPage] = useState(1)
   const limit = 6
-
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -52,21 +50,21 @@ export default function HomePage() {
   }, [debouncedSearch, category, location, page])
 
   return (
-    <main className="p-8 space-y-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-center">Cari Event</h1>
+    <main className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
+      <h1 className="text-2xl md:text-3xl font-bold text-center">Cari Event</h1>
 
-      {/* Filter Section */}
-      <div className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row gap-4">
+      {/* Search & Filters */}
+      <div className="flex flex-col md:flex-row gap-4 w-full">
         <input
           type="text"
           placeholder="Cari berdasarkan nama atau lokasi..."
-          className="flex-1 border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border rounded p-3 text-base"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
-          className="border rounded px-3 py-2"
+          className="border rounded p-3"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
@@ -77,7 +75,7 @@ export default function HomePage() {
         </select>
 
         <select
-          className="border rounded px-3 py-2"
+          className="border rounded p-3"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
         >
@@ -89,7 +87,7 @@ export default function HomePage() {
       </div>
 
       {/* Event Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.length > 0 ? (
           events.map((event) => <EventCard key={event.id} {...event} />)
         ) : (
@@ -102,17 +100,17 @@ export default function HomePage() {
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1 || isLoading}
-          className="px-4 py-2 border rounded hover:bg-gray-100 disabled:opacity-50"
+          className="px-4 py-2 border rounded disabled:opacity-50 hover:bg-gray-100 transition"
         >
           Previous
         </button>
 
-        <span className="py-2">Page {page}</span>
+        <span className="py-2 font-medium">Page {page}</span>
 
         <button
           onClick={() => setPage((prev) => prev + 1)}
           disabled={!hasMore || isLoading}
-          className="px-4 py-2 border rounded hover:bg-gray-100 disabled:opacity-50"
+          className="px-4 py-2 border rounded disabled:opacity-50 hover:bg-gray-100 transition"
         >
           Next
         </button>
